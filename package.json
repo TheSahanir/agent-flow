@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "export": "next build"
+    "export": "next build",
+    "build:cloudflare": "npm run build && npx @cloudflare/next-on-pages",
+    "preview": "npm run build:cloudflare && wrangler pages dev .vercel/output/static --compatibility-date=2024-01-01",
+    "deploy": "npm run build:cloudflare && wrangler pages deploy .vercel/output/static"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",
@@ -25,6 +28,7 @@
     "stripe": "^18.3.0"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.13.12",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
@@ -33,6 +37,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.4.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.25.0"
   }
 }
