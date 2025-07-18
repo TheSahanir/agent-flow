@@ -26,7 +26,8 @@ if [ -d ".vercel/output/static" ]; then
         echo "🌐 Fazendo deploy com wrangler..."
         wrangler pages deploy .vercel/output/static --project-name=agentflow
     else
-        echo "⚠️  Wrangler não encontrado. Use: npx wrangler pages deploy .vercel/output/static"
+        echo "🌐 Fazendo deploy com npx..."
+        npx wrangler pages deploy .vercel/output/static --project-name=agentflow
     fi
 else
     echo "❌ Erro: Build não gerou a pasta .vercel/output/static"
