@@ -28,16 +28,14 @@ export default function LoginPage() {
         console.log('Login bem-sucedido:', data)
         console.log('Redirecionando para dashboard...')
         
-        // Verificar se o usuário está realmente logado
-        const { data: { user } } = await supabase.auth.getUser()
-        console.log('Usuário atual:', user)
+        // Forçar redirecionamento com router
+        router.push('/dashboard')
+        router.refresh()
         
-        if (user) {
-          // Redirecionamento imediato
+        // Fallback se o router não funcionar
+        setTimeout(() => {
           window.location.href = '/dashboard'
-        } else {
-          setError('Erro ao verificar login')
-        }
+        }, 100)
       }
     } catch (error) {
       console.error('Erro no login:', error)
