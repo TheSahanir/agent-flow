@@ -1,0 +1,17 @@
+# Cloudflare Pages redirects for Next.js
+# Handle SPA routing - redirect all routes to index.html
+/* /index.html 200
+
+# API routes should work normally
+/api/* /api/:splat 200
+
+# Auth callback needs special handling
+/auth/callback /api/auth/callback 200
+
+# Static assets
+/static/* /static/:splat 200
+/_next/static/* /_next/static/:splat 200
+/_next/image/* /_next/image/:splat 200
+/favicon.ico /favicon.ico 200
+/manifest.json /manifest.json 200
+/robots.txt /robots.txt 200

@@ -10,6 +10,8 @@ export async function GET(request: Request) {
   const error = searchParams.get('error')
   const error_description = searchParams.get('error_description')
 
+  console.log('Auth callback received:', { code, next, error, origin })
+
   // Handle error cases
   if (error) {
     console.error('Auth error:', error, error_description)
@@ -34,7 +36,14 @@ export async function GET(request: Request) {
               return match ? match[1] : null
             },
             set(name: string, value: string, options: any) {
-              response.headers.append('Set-Cookie', `${name}=${value}; ${Object.entries(options).map(([k, v]) => `${k}=${v}`).join('; ')}`)
+              // Ensure cookies are set correctly for Cloudflare
+              const cookieOptions = {
+                ...options,
+                secure: true,
+                sameSite: 'lax',
+                path: '/'
+              }
+              response.headers.append('Set-Cookie', `${name}=${value}; ${Object.entries(cookieOptions).map(([k, v]) => `${k}=${v}`).join('; ')}`)
             },
             remove(name: string, options: any) {
               response.headers.append('Set-Cookie', `${name}=; Max-Age=0; ${Object.entries(options).map(([k, v]) => `${k}=${v}`).join('; ')}`)
@@ -51,6 +60,7 @@ export async function GET(request: Request) {
         return NextResponse.redirect(`${origin}/auth/login?error=session_exchange_failed`)
       }
 
+      console.log('Session created successfully:', data.user?.email)
       return response
     } catch (error) {
       console.error('Auth callback error:', error)
