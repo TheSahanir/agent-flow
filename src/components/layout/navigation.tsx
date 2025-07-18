@@ -1,30 +1,47 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Home, PlusCircle, BarChart3, Settings, User, LogOut, Menu, X } from 'lucide-react';
+import { Home, PlusCircle, BarChart3, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { UserMenu } from './user-menu';
 
-interface NavigationProps {
-  isAuthenticated?: boolean;
-}
-
-export function Navigation({ isAuthenticated = false }: NavigationProps) {
+export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClientComponentClient();
   const router = useRouter();
+
+  useEffect(() => {
+    checkUser();
+  }, []);
+
+  const checkUser = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    } catch (error) {
+      console.error('Error checking user:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const navigationItems = [
     { name: 'Início', href: '/', icon: Home },
-    { name: 'Criar Agente', href: '/create-agent', icon: PlusCircle },
-    { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
+    ...(user ? [
+      { name: 'Criar Agente', href: '/create-agent', icon: PlusCircle },
+      { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
+    ] : []),
   ];
 
-  const userItems = [
-    { name: 'Configurações', href: '/settings', icon: Settings },
-    { name: 'Perfil', href: '/profile', icon: User },
-    { name: 'Sair', href: '/logout', icon: LogOut },
+  const authItems = user ? [] : [
+    { name: 'Entrar', href: '/auth/login', icon: null },
+    { name: 'Cadastrar', href: '/auth/signup', icon: null },
   ];
 
   return (
@@ -53,28 +70,24 @@ export function Navigation({ isAuthenticated = false }: NavigationProps) {
                 className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-200"
                 onClick={() => router.push(item.href)}
               >
-                <item.icon className="w-4 h-4" />
+                {item.icon && <item.icon className="w-4 h-4" />}
                 <span className="text-sm font-medium">{item.name}</span>
               </motion.button>
             ))}
             
-            {isAuthenticated && (
-              <>
-                <div className="w-px h-6 bg-gray-300 mx-2" />
-                {userItems.map((item) => (
-                  <motion.button
-                    key={item.name}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-200"
-                    onClick={() => router.push(item.href)}
-                  >
-                    <item.icon className="w-4 h-4" />
-                    <span className="text-sm font-medium">{item.name}</span>
-                  </motion.button>
-                ))}
-              </>
-            )}
+            {authItems.map((item) => (
+              <motion.button
+                key={item.name}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-200"
+                onClick={() => router.push(item.href)}
+              >
+                <span className="text-sm font-medium">{item.name}</span>
+              </motion.button>
+            ))}
+            
+            {user && <UserMenu user={user} />}
           </div>
 
           {/* Mobile menu button */}
@@ -108,29 +121,29 @@ export function Navigation({ isAuthenticated = false }: NavigationProps) {
                 setIsMenuOpen(false);
               }}
             >
-              <item.icon className="w-5 h-5" />
+              {item.icon && <item.icon className="w-5 h-5" />}
               <span className="font-medium">{item.name}</span>
             </motion.button>
           ))}
           
-          {isAuthenticated && (
-            <>
-              <div className="w-full h-px bg-gray-200 my-2" />
-              {userItems.map((item) => (
-                <motion.button
-                  key={item.name}
-                  whileTap={{ scale: 0.95 }}
-                  className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-200"
-                  onClick={() => {
-                    router.push(item.href);
-                    setIsMenuOpen(false);
-                  }}
-                >
-                  <item.icon className="w-5 h-5" />
-                  <span className="font-medium">{item.name}</span>
-                </motion.button>
-              ))}
-            </>
+          {authItems.map((item) => (
+            <motion.button
+              key={item.name}
+              whileTap={{ scale: 0.95 }}
+              className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-200"
+              onClick={() => {
+                router.push(item.href);
+                setIsMenuOpen(false);
+              }}
+            >
+              <span className="font-medium">{item.name}</span>
+            </motion.button>
+          ))}
+          
+          {user && (
+            <div className="border-t border-gray-200 pt-2">
+              <UserMenu user={user} />
+            </div>
           )}
         </div>
       </motion.div>
