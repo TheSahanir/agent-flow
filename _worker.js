@@ -1,8 +1,7 @@
-// Cloudflare Pages Functions
+import { handleRequest } from '@cloudflare/next-on-pages';
+
 export default {
   async fetch(request, env, ctx) {
-    return new Response('Cloudflare Pages está funcionando!', {
-      headers: { 'content-type': 'text/plain' },
-    });
-  },
+    return handleRequest({ request, env, ctx });
+  }
 };
