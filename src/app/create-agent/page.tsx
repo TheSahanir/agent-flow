@@ -1,16 +1,50 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AgentForm } from '@/components/create-agent/agent-form';
 import { AgentFormData } from '@/types';
 import { motion } from 'framer-motion';
+import { createClient } from '@supabase/supabase-js';
 
 export default function CreateAgentPage() {
   const router = useRouter();
   const [isCreating, setIsCreating] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      setIsCheckingAuth(false);
+      
+      // Check for saved form data after login
+      const savedData = localStorage.getItem('pendingAgentData');
+      if (savedData && user) {
+        localStorage.removeItem('pendingAgentData');
+        // Auto-submit the saved data
+        const data = JSON.parse(savedData);
+        handleCreateAgent(data);
+      }
+    };
+    
+    checkAuth();
+  }, []);
 
   const handleCreateAgent = async (data: AgentFormData) => {
+    if (!user) {
+      // Store form data in localStorage and redirect to login
+      localStorage.setItem('pendingAgentData', JSON.stringify(data));
+      router.push('/auth/login');
+      return;
+    }
+
     setIsCreating(true);
     
     // Aqui você faria a chamada para criar o agente no backend

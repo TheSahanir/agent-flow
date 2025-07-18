@@ -23,7 +23,14 @@ export default function LoginPage() {
       if (error) {
         setError(error.message)
       } else {
-        router.push('/dashboard')
+        // Check if there's pending agent data
+        const pendingData = localStorage.getItem('pendingAgentData');
+        if (pendingData) {
+          localStorage.removeItem('pendingAgentData');
+          router.push('/create-agent');
+        } else {
+          router.push('/dashboard');
+        }
       }
     } catch (error) {
       setError('Erro ao fazer login')

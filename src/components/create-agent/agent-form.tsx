@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronLeft, Check } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, Bot, Building2, Package, MessageSquare, Sparkles } from 'lucide-react';
 import { AgentFormData } from '@/types';
 
 interface AgentFormProps {
@@ -10,10 +10,10 @@ interface AgentFormProps {
 }
 
 const steps = [
-  { id: 1, title: 'Informações Básicas', description: 'Nome do agente e empresa' },
-  { id: 2, title: 'Produtos/Serviços', description: 'O que você oferece' },
-  { id: 3, title: 'Perguntas Frequentes', description: 'FAQ do seu negócio' },
-  { id: 4, title: 'Personalidade', description: 'Como seu agente deve se comportar' },
+  { id: 1, title: 'Informações Básicas', description: 'Nome do agente e empresa', icon: Bot },
+  { id: 2, title: 'Produtos/Serviços', description: 'O que você oferece', icon: Package },
+  { id: 3, title: 'Perguntas Frequentes', description: 'FAQ do seu negócio', icon: MessageSquare },
+  { id: 4, title: 'Personalidade', description: 'Como seu agente deve se comportar', icon: Sparkles },
 ];
 
 export function AgentForm({ onComplete }: AgentFormProps) {
@@ -68,12 +68,12 @@ export function AgentForm({ onComplete }: AgentFormProps) {
             <div key={step.id} className="flex items-center">
               <div className="flex flex-col items-center">
                 <motion.div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
+                  className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
                     currentStep > step.id
-                      ? 'bg-green-500 text-white'
+                      ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white'
                       : currentStep === step.id
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-gray-200 text-gray-600'
+                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-500/25'
+                      : 'bg-gray-100 text-gray-500 border border-gray-300'
                   }`}
                   animate={{
                     scale: currentStep === step.id ? 1.1 : 1,
@@ -82,18 +82,20 @@ export function AgentForm({ onComplete }: AgentFormProps) {
                   {currentStep > step.id ? (
                     <Check className="w-5 h-5" />
                   ) : (
-                    step.id
+                    <step.icon className="w-5 h-5" />
                   )}
                 </motion.div>
-                <div className="mt-2 text-center">
-                  <p className="text-sm font-medium text-gray-900">{step.title}</p>
-                  <p className="text-xs text-gray-500">{step.description}</p>
+                <div className="mt-3 text-center">
+                  <p className={`text-sm font-medium transition-colors ${
+                    currentStep >= step.id ? 'text-gray-900' : 'text-gray-500'
+                  }`}>{step.title}</p>
+                  <p className="text-xs text-gray-500 mt-1">{step.description}</p>
                 </div>
               </div>
               {index < steps.length - 1 && (
                 <div
-                  className={`w-full h-1 mx-4 ${
-                    currentStep > step.id ? 'bg-green-500' : 'bg-gray-200'
+                  className={`w-full h-0.5 mx-4 transition-all duration-500 ${
+                    currentStep > step.id ? 'bg-gradient-to-r from-green-500 to-emerald-500' : 'bg-gray-200'
                   }`}
                 />
               )}
@@ -102,7 +104,7 @@ export function AgentForm({ onComplete }: AgentFormProps) {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-xl p-8">
+      <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-200">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
@@ -140,33 +142,39 @@ export function AgentForm({ onComplete }: AgentFormProps) {
 
         {/* Navigation */}
         <div className="flex justify-between mt-8">
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={handlePrevious}
             disabled={currentStep === 1}
-            className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center px-6 py-3 text-gray-700 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronLeft className="w-5 h-5 mr-2" />
             Anterior
-          </button>
+          </motion.button>
 
           {currentStep < steps.length ? (
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={handleNext}
               disabled={!isStepValid()}
-              className="flex items-center px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-purple-500/25"
             >
               Próximo
               <ChevronRight className="w-5 h-5 ml-2" />
-            </button>
+            </motion.button>
           ) : (
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={handleSubmit}
               disabled={!isStepValid()}
-              className="flex items-center px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-2xl hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-green-500/25"
             >
               Criar Agente
               <Check className="w-5 h-5 ml-2" />
-            </button>
+            </motion.button>
           )}
         </div>
       </div>
@@ -183,31 +191,33 @@ function Step1BasicInfo({ data, onChange }: { data: AgentFormData; onChange: (da
         <p className="text-gray-600">Comece dando um nome ao seu agente e identificando sua empresa</p>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Nome do seu agente
-        </label>
-        <input
-          type="text"
-          value={data.name}
-          onChange={(e) => onChange({ ...data, name: e.target.value })}
-          placeholder="Ex: Clara, Assistente Virtual"
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-        />
-        <p className="text-sm text-gray-500 mt-1">Este será o nome que seus clientes verão</p>
-      </div>
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-900 mb-2">
+            Nome do seu agente
+          </label>
+          <input
+            type="text"
+            value={data.name}
+            onChange={(e) => onChange({ ...data, name: e.target.value })}
+            placeholder="Ex: Clara, Assistente Virtual"
+            className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300"
+          />
+          <p className="text-sm text-gray-600 mt-1">Este será o nome que seus clientes verão</p>
+        </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Nome da sua empresa
-        </label>
-        <input
-          type="text"
-          value={data.company_name}
-          onChange={(e) => onChange({ ...data, company_name: e.target.value })}
-          placeholder="Ex: Tech Solutions Ltda"
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-        />
+        <div>
+          <label className="block text-sm font-medium text-gray-900 mb-2">
+            Nome da sua empresa
+          </label>
+          <input
+            type="text"
+            value={data.company_name}
+            onChange={(e) => onChange({ ...data, company_name: e.target.value })}
+            placeholder="Ex: Tech Solutions Ltda"
+            className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300"
+          />
+        </div>
       </div>
     </div>
   );
@@ -252,7 +262,7 @@ function Step2Products({ data, onChange }: { data: AgentFormData; onChange: (dat
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-900 mb-2">
             Descrição dos produtos e serviços
           </label>
           <textarea
@@ -263,9 +273,9 @@ Produto A: Descrição detalhada do produto A - R$ 99.90
 Serviço B: Descrição do serviço B - R$ 150.00
 Produto C: Descrição do produto C"
             rows={8}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300 resize-none"
           />
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-600 mt-1">
             Digite cada produto/serviço em uma linha separada. Use o formato: Nome: Descrição - Preço (opcional)
           </p>
         </div>
@@ -332,7 +342,7 @@ function Step3FAQs({ data, onChange }: { data: AgentFormData; onChange: (data: A
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-900 mb-2">
             Perguntas e Respostas
           </label>
           <textarea
@@ -348,9 +358,9 @@ A: Você pode rastrear seu pedido através do número de rastreamento enviado po
 Pergunta: Vocês entregam para todo o Brasil?
 Resposta: Sim, fazemos entrega para todo o território nacional."
             rows={10}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300 resize-none"
           />
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-600 mt-1">
             Digite as perguntas e respostas. Use o formato Q: para perguntas e A: para respostas, ou escreva naturalmente.
           </p>
         </div>
@@ -368,49 +378,54 @@ function Step4Personality({ data, onChange }: { data: AgentFormData; onChange: (
         <p className="text-gray-600">Defina como seu agente deve se comportar</p>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Descrição da personalidade
-        </label>
-        <textarea
-          value={data.personality}
-          onChange={(e) => onChange({ ...data, personality: e.target.value })}
-          placeholder="Ex: Sempre simpática e prestativa, usa linguagem simples e direta..."
-          rows={4}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-        />
-      </div>
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-900 mb-2">
+            Descrição da personalidade
+          </label>
+          <textarea
+            value={data.personality}
+            onChange={(e) => onChange({ ...data, personality: e.target.value })}
+            placeholder="Ex: Sempre simpática e prestativa, usa linguagem simples e direta..."
+            rows={4}
+            className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300 resize-none"
+          />
+        </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Estilo de resposta
-        </label>
-        <select
-          value={data.response_style}
-          onChange={(e) => onChange({ ...data, response_style: e.target.value as 'formal' | 'friendly' | 'casual' })}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-        >
-          <option value="formal">Formal e profissional</option>
-          <option value="friendly">Amigável e prestativo</option>
-          <option value="casual">Descontraído e informal</option>
-        </select>
-      </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-900 mb-2">
+            Estilo de resposta
+          </label>
+          <select
+            value={data.response_style}
+            onChange={(e) => onChange({ ...data, response_style: e.target.value as 'formal' | 'friendly' | 'casual' })}
+            className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300"
+          >
+            <option value="formal">Formal e profissional</option>
+            <option value="friendly">Amigável e prestativo</option>
+            <option value="casual">Descontraído e informal</option>
+          </select>
+        </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Nível de criatividade: {data.creativity_level}%
-        </label>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={data.creativity_level}
-          onChange={(e) => onChange({ ...data, creativity_level: Number(e.target.value) })}
-          className="w-full"
-        />
-        <div className="flex justify-between text-sm text-gray-500">
-          <span>Conservador</span>
-          <span>Criativo</span>
+        <div>
+          <label className="block text-sm font-medium text-gray-900 mb-2">
+            Nível de criatividade: {data.creativity_level}%
+          </label>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={data.creativity_level}
+            onChange={(e) => onChange({ ...data, creativity_level: Number(e.target.value) })}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+            style={{
+              background: `linear-gradient(to right, #8b5cf6 0%, #8b5cf6 ${data.creativity_level}%, #e5e7eb ${data.creativity_level}%, #e5e7eb 100%)`
+            }}
+          />
+          <div className="flex justify-between text-sm text-gray-600 mt-2">
+            <span>Conservador</span>
+            <span>Criativo</span>
+          </div>
         </div>
       </div>
     </div>

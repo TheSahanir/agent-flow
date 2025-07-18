@@ -63,8 +63,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
-  // Protect create-agent routes
-  if (request.nextUrl.pathname.startsWith('/create-agent') && !user) {
+  // Allow access to create-agent without login (will redirect after form completion)
+  // Only protect the actual agent creation endpoint
+  if (request.nextUrl.pathname.startsWith('/api/agents') && !user) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
