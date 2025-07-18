@@ -1,16 +1,40 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-// Admin client for server-side operations only
-// This should only be used in API routes, not in client components
-export const createAdminClient = () => {
-  if (typeof window !== 'undefined') {
-    throw new Error('Admin client can only be used server-side');
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
   }
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-  return createClient(supabaseUrl, supabaseServiceKey);
-};
+})
+
+// Client-side auth helper
+export const getUser = async () => {
+  const { data: { user } } = await supabase.auth.getUser()
+  return user
+}
+
+export const signIn = async (email: string, password: string) => {
+  return await supabase.auth.signInWithPassword({
+    email,
+    password,
+  })
+}
+
+export const signUp = async (email: string, password: string, fullName: string) => {
+  return await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: fullName,
+      }
+    }
+  })
+}
+
+export const signOut = async () => {
+  return await supabase.auth.signOut()
+}
