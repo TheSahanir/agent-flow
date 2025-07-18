@@ -18,21 +18,29 @@ export default function LoginPage() {
     setError('')
 
     try {
+      console.log('Tentando login com:', email)
       const { data, error } = await signIn(email, password)
       
       if (error) {
+        console.error('Erro de login:', error)
         setError(error.message)
       } else {
-        // Check if there's pending agent data
-        const pendingData = localStorage.getItem('pendingAgentData');
-        if (pendingData) {
-          localStorage.removeItem('pendingAgentData');
-          router.push('/create-agent');
+        console.log('Login bem-sucedido:', data)
+        console.log('Redirecionando para dashboard...')
+        
+        // Verificar se o usuário está realmente logado
+        const { data: { user } } = await supabase.auth.getUser()
+        console.log('Usuário atual:', user)
+        
+        if (user) {
+          // Redirecionamento imediato
+          window.location.href = '/dashboard'
         } else {
-          router.push('/dashboard');
+          setError('Erro ao verificar login')
         }
       }
     } catch (error) {
+      console.error('Erro no login:', error)
       setError('Erro ao fazer login')
     } finally {
       setLoading(false)
