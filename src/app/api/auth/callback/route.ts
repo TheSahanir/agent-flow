@@ -1,47 +1,52 @@
 import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
-export async function GET(request: NextRequest) {
-  const requestUrl = new URL(request.url)
-  const code = requestUrl.searchParams.get('code')
+export const runtime = 'edge'
+
+export async function GET(request: Request) {
+  const { searchParams, origin } = new URL(request.url)
+  const code = searchParams.get('code')
+  const next = searchParams.get('next') ?? '/dashboard'
 
   if (code) {
-    const cookieStore = await cookies()
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
           get(name: string) {
-            return cookieStore.get(name)?.value
+            const cookie = request.headers.get('cookie')
+            if (!cookie) return null
+            const match = cookie.match(new RegExp(`${name}=([^;]+)`))
+            return match ? match[1] : null
           },
           set(name: string, value: string, options: any) {
-            cookieStore.set({ name, value, ...options })
+            // No-op for edge runtime - cookies will be handled by the client
           },
           remove(name: string, options: any) {
-            cookieStore.set({ name, value: '', ...options })
+            // No-op for edge runtime
           },
         },
       }
     )
     
-    try {
-      const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    
+    if (!error) {
+      const response = NextResponse.redirect(`${origin}${next}`)
       
-      if (error) {
-        console.error('Auth callback error:', error)
-        return NextResponse.redirect(`${requestUrl.origin}/auth/login?error=auth_failed`)
+      // Set session cookie manually
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        response.headers.set(
+          'set-cookie',
+          `sb-${process.env.NEXT_PUBLIC_SUPABASE_URL?.split('.')[0]}-auth-token=${encodeURIComponent(JSON.stringify(session))}; Path=/; HttpOnly; Secure; SameSite=Lax`
+        )
       }
       
-      // URL to redirect to after sign in process completes
-      return NextResponse.redirect(`${requestUrl.origin}/dashboard`)
-    } catch (error) {
-      console.error('Auth callback exception:', error)
-      return NextResponse.redirect(`${requestUrl.origin}/auth/login?error=auth_exception`)
+      return response
     }
   }
 
-  // return the user to an error page with instructions
-  return NextResponse.redirect(`${requestUrl.origin}/auth/login?error=no_code`)
+  return NextResponse.redirect(`${origin}/auth/login?error=auth_failed`)
 }
