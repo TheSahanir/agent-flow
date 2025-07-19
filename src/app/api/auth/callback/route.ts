@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
+// Configuração para Cloudflare Pages - exportação estática
+export const dynamic = 'force-static'
+export const revalidate = 0
+
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
@@ -18,10 +22,8 @@ export async function GET(request: Request) {
 
   if (code) {
     try {
-      // Create a response that will handle the auth code exchange
       const response = NextResponse.redirect(`${origin}${next}`)
       
-      // Create a server client to exchange the code for a session
       const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -34,7 +36,6 @@ export async function GET(request: Request) {
               return match ? match[1] : null
             },
             set(name: string, value: string, options: any) {
-              // Ensure cookies are set correctly for Cloudflare
               const cookieOptions = {
                 ...options,
                 secure: true,
@@ -50,7 +51,6 @@ export async function GET(request: Request) {
         }
       )
 
-      // Exchange code for session
       const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code)
       
       if (sessionError) {
