@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { supabase, signIn } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -14,34 +14,39 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log('=== LOGIN INICIADO ===')
     setLoading(true)
     setError('')
 
     try {
-      console.log('Tentando login com:', email)
-      const { data, error } = await signIn(email, password)
+      console.log('Email:', email)
+      console.log('Password:', password ? '***' : 'vazio')
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+      
+      console.log('Resposta Supabase:', { data, error })
       
       if (error) {
-        console.error('Erro de login:', error)
+        console.error('Erro Supabase:', error)
         setError(error.message)
+      } else if (data.user) {
+        console.log('Login bem-sucedido! Usuário:', data.user.email)
+        console.log('Redirecionando para dashboard...')
+        router.push('/dashboard')
+        // Forçar reload para garantir que o middleware seja executado
+        setTimeout(() => {
+          window.location.href = '/dashboard'
+        }, 100)
       } else {
-        console.log('Login bem-sucedido:', data)
-        
-        // Verificar se o usuário está realmente autenticado
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          console.log('Usuário autenticado:', user.email)
-          // Usar router.push para navegação client-side
-          router.push('/dashboard')
-          router.refresh() // Forçar refresh da página
-        } else {
-          console.error('Usuário não encontrado após login')
-          setError('Erro na autenticação')
-        }
+        console.error('Login falhou: usuário não encontrado')
+        setError('Credenciais inválidas')
       }
     } catch (error) {
-      console.error('Erro no login:', error)
-      setError('Erro ao fazer login')
+      console.error('Erro catastrófico:', error)
+      setError('Erro ao conectar ao servidor')
     } finally {
       setLoading(false)
     }
@@ -60,6 +65,7 @@ export default function LoginPage() {
         setError(error.message)
       }
     } catch (error) {
+      console.error('Erro Google login:', error)
       setError('Erro ao conectar com Google')
     }
   }
@@ -100,6 +106,7 @@ export default function LoginPage() {
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
               />
             </div>
             <div>
@@ -115,6 +122,7 @@ export default function LoginPage() {
                 placeholder="Senha"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
               />
             </div>
           </div>
@@ -143,7 +151,8 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={handleGoogleLogin}
-                className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                disabled={loading}
+                className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
               >
                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
