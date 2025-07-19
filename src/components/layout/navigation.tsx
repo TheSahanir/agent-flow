@@ -33,8 +33,6 @@ export function Navigation() {
 
   const navigationItems = [
     { name: 'Início', href: '/', icon: Home },
-    { name: 'Teste Auth', href: '/test-auth', icon: null },
-    { name: 'Debug Login', href: '/debug-redirect', icon: null },
     ...(user ? [
       { name: 'Criar Agente', href: '/create-agent', icon: PlusCircle },
       { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },

@@ -8,6 +8,7 @@ import { Agent } from '@/types';
 import { motion } from 'framer-motion';
 import { Plus, Settings, Play, Trash2, Bot, CreditCard } from 'lucide-react';
 import CreditsPurchase from '@/components/credits/credits-purchase';
+import { SocialIntegration } from '@/components/dashboard/social-integration';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -171,6 +172,12 @@ export default function DashboardPage() {
             ))}
           </div>
         )}
+
+        <div className="mt-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <SocialIntegration userId={user?.id} />
+          </div>
+        </div>
 
         <div className="mt-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

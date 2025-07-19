@@ -1,17 +1,23 @@
-name = "agent-flow"
+name = "agentflow"
+main = ".next/standalone/server.js"
 compatibility_date = "2024-01-01"
-compatibility_flags = ["nodejs_compat"]
 
 [build]
 command = "npm run build"
 
 [env.production]
-name = "agent-flow"
+name = "agentflow"
 
-[[env.production.routes]]
-pattern = "/*"
-zone_name = "agentflow.pages.dev"
+[env.staging]
+name = "agentflow-staging"
 
-[env.production.vars]
-NEXT_PUBLIC_SUPABASE_URL = ""
-NEXT_PUBLIC_SUPABASE_ANON_KEY = ""
+[vars]
+NEXT_PUBLIC_APP_URL = "https://agentflow.pages.dev"
+
+[[env.production.kv_namespaces]]
+binding = "KV"
+id = "your-kv-namespace-id"
+
+[[env.staging.kv_namespaces]]
+binding = "KV"
+id = "your-staging-kv-namespace-id"
