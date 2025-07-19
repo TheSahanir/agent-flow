@@ -26,14 +26,14 @@ export default function LoginPage() {
         setError(error.message)
       } else {
         console.log('Login bem-sucedido:', data)
-        console.log('Redirecionando para dashboard...')
         
         // Verificar se o usuário está realmente autenticado
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
           console.log('Usuário autenticado:', user.email)
-          // Redirecionamento direto sem delay
-          window.location.href = '/dashboard'
+          // Usar router.push para navegação client-side
+          router.push('/dashboard')
+          router.refresh() // Forçar refresh da página
         } else {
           console.error('Usuário não encontrado após login')
           setError('Erro na autenticação')
@@ -52,7 +52,7 @@ export default function LoginPage() {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
         },
       })
       
