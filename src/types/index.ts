@@ -135,11 +135,21 @@ export interface ApiResponse<T> {
 export interface AgentFormData {
   name: string;
   company_name: string;
-  products: Omit<Product, 'id' | 'agent_id' | 'created_at'>[];
-  faqs: Omit<FAQ, 'id' | 'agent_id' | 'created_at'>[];
   personality: string;
   response_style: 'formal' | 'friendly' | 'casual';
   creativity_level: number;
+  products: Product[];
+  faqs: FAQ[];
+}
+
+export interface ChatMessage {
+  id: string;
+  user_id: string;
+  agent_id: string;
+  message: string;
+  response?: string;
+  credits_used: number;
+  created_at: string;
 }
 
 // AI Platform types (white-label)

@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { AgentService } from '@/services/agent-service';
 import { Agent } from '@/types';
 import { motion } from 'framer-motion';
-import { Plus, Settings, Play, Trash2, Bot, CreditCard } from 'lucide-react';
+import { Plus, Settings, Play, Trash2, Bot, CreditCard, MessageCircle } from 'lucide-react';
 import CreditsPurchase from '@/components/credits/credits-purchase';
 import { SocialIntegration } from '@/components/dashboard/social-integration';
 
@@ -145,15 +145,21 @@ export default function DashboardPage() {
 
                 <div className="flex space-x-2">
                   <button
+                    onClick={() => router.push(`/dashboard/chat/${agent.id}`)}
+                    className="flex-1 flex items-center justify-center px-3 py-2 text-sm font-medium rounded-md bg-purple-100 text-purple-800 hover:bg-purple-200"
+                  >
+                    <MessageCircle className="w-4 h-4 mr-1" />
+                    Conversar
+                  </button>
+                  <button
                     onClick={() => handleToggleAgent(agent)}
-                    className={`flex-1 flex items-center justify-center px-3 py-2 text-sm font-medium rounded-md ${
+                    className={`flex items-center justify-center px-3 py-2 text-sm font-medium rounded-md ${
                       agent.is_active
                         ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
                         : 'bg-green-100 text-green-800 hover:bg-green-200'
                     }`}
                   >
-                    <Play className="w-4 h-4 mr-1" />
-                    {agent.is_active ? 'Pausar' : 'Ativar'}
+                    <Play className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => router.push(`/agents/${agent.id}/settings`)}

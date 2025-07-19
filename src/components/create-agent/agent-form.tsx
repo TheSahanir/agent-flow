@@ -247,7 +247,14 @@ function Step2Products({ data, onChange }: { data: AgentFormData; onChange: (dat
         price = parseFloat(priceMatch[1]);
       }
       
-      return { name, description, price };
+      return { 
+        id: '', 
+        agent_id: '', 
+        name, 
+        description, 
+        price, 
+        created_at: '' 
+      };
     });
     
     onChange({ ...data, products });
@@ -326,7 +333,14 @@ function Step3FAQs({ data, onChange }: { data: AgentFormData; onChange: (data: A
           answer = lines.slice(1).join(' ').trim();
         }
         
-        return { question, answer, keywords: [] };
+        return { 
+          id: '', 
+          agent_id: '', 
+          question, 
+          answer, 
+          keywords: [] as string[], 
+          created_at: '' 
+        };
       })
       .filter(f => f.question && f.answer);
     

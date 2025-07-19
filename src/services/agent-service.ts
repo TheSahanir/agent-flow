@@ -117,4 +117,15 @@ export class AgentService {
 
     if (error) throw error;
   }
+
+  static async getAgent(agentId: string): Promise<Agent> {
+    const { data, error } = await supabase
+      .from('agents')
+      .select('*')
+      .eq('id', agentId)
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
 }

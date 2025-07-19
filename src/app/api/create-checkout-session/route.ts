@@ -9,7 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: NextRequest) {
   try {
-    const { priceId, userId } = await request.json()
+    const { priceId, credits, planId, userId } = await request.json()
     
     if (!userId) {
       return NextResponse.json({ error: 'User ID required' }, { status: 400 })
@@ -28,6 +28,8 @@ export async function POST(request: NextRequest) {
       cancel_url: `${request.headers.get('origin')}/credits?canceled=true`,
       metadata: {
         userId,
+        credits: credits.toString(),
+        planId,
       },
     })
 
